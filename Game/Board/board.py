@@ -78,12 +78,24 @@ class Board:
         for piece in self.get_all_pieces():
             if piece.color == color:
                 moves, capture_moves = self.get_legal_moves(piece)
-                yield moves + capture_moves, piece
+                yield [moves, capture_moves], piece
 
     def get_all_legal_board_states(self, color):
         piece: Piece
-        for moves, piece in self.get_all_legal_moves(color):
+        for [moves_, capture_moves], piece in self.get_all_legal_moves(color):
+            moves = moves_ + capture_moves
             for move in moves:
+                old_position = piece.get_position()
+                piece_org = self.fake_move(piece, move)
+                try:
+                    yield self, piece, move
+                finally:
+                    self.revert_move(piece_org, piece, old_position, move)
+
+    def get_all_legal_board_states_from_capture_moves(self, color):
+        piece: Piece
+        for [_, capture_moves], piece in self.get_all_legal_moves(color):
+            for move in capture_moves:
                 old_position = piece.get_position()
                 piece_org = self.fake_move(piece, move)
                 try:

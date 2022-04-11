@@ -27,7 +27,7 @@ class Game:
         self.capture_sound = pygame.mixer.Sound(os.path.join(settings.ASSET_FOLDER, 'sounds/Capture.ogg'))
 
         self.clock = pygame.time.Clock()
-        self.opponent = AI(self.board, "b")
+        self.opponent = AI(self.board)
 
     def start(self, start_ai=False):
         pygame.event.clear()
@@ -38,16 +38,20 @@ class Game:
             self.__set_mouse_pos()
 
             if start_ai:
-                self.__ai_move("b")
+                self.__ai_move("b", 2)
+
             self.__check_if_game_over()
 
             if self.not_gameover:
                 self.__handle_events()
                 self.__check_if_game_over()
         
-    def __ai_move(self, player):
+    def __ai_move(self, player, method):
         if self.board.current_player == player:
-            piece_, best_move = self.opponent.get_best_move()
+            if method == 1:
+                piece_, best_move = self.opponent.get_best_move2(player)
+            elif method == 2:
+                piece_, best_move = self.opponent.get_best_move(player)
 
             if self.board.get_piece_at_position(best_move) is not None:
                 self.capture_sound.play()
