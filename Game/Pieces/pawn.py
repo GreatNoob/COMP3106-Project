@@ -8,7 +8,6 @@ class Pawn(Piece):
         super().__init__(color, x, y)
         self.symbol = ' '
         self.sprite = ps.piece_sprites(self)
-        self.last_move = None
 
         self.points = 10 if self.color == 'w' else -10
 

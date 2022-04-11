@@ -1,10 +1,9 @@
 import os
-import time
 
 import pygame
 import settings
 from Game.utils import is_on_board, LEFT_CLICK, RIGHT_CLICK
-
+from Game.AI.ai import AI
 
 from GUI.gamedrawer import GameDrawer
 from Game.Board.board import Board
@@ -28,8 +27,9 @@ class Game:
         self.capture_sound = pygame.mixer.Sound(os.path.join(settings.ASSET_FOLDER, 'sounds/Capture.ogg'))
 
         self.clock = pygame.time.Clock()
+        self.opponent = AI(self.board, "b")
 
-    def start_against_ai(self):
+    def start(self, start_ai=False):
         pygame.event.clear()
         while self.not_gameover:
             self.redraw()
@@ -37,11 +37,26 @@ class Game:
             self.clock.tick(settings.FPS)
             self.__set_mouse_pos()
 
+            if start_ai:
+                self.__ai_move("b")
             self.__check_if_game_over()
 
             if self.not_gameover:
                 self.__handle_events()
                 self.__check_if_game_over()
+        
+    def __ai_move(self, player):
+        if self.board.current_player == player:
+            piece_, best_move = self.opponent.get_best_move()
+
+            if self.board.get_piece_at_position(best_move) is not None:
+                self.capture_sound.play()
+            else:
+                self.move_sound.play()
+
+            self.board.move(piece_, best_move)
+            if self.board.piece_to_promote is not None:
+                self.board.promote_pawn(self.board.piece_to_promote, 0)
 
     def __handle_events(self):
         for event in pygame.event.get():
@@ -58,6 +73,9 @@ class Game:
             elif event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.board.resign()
                 self.not_gameover = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_z and pygame.key.get_mods() & pygame.KMOD_CTRL:
+                    self.board.revert_last_move()
 
     def redraw(self):
         self.game_drawer.draw(self.selected, self.selected_move_arr, self.selected_capture_arr,

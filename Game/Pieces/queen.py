@@ -9,7 +9,6 @@ class Queen(Rook, Bishop, Piece):
         super().__init__(color, x, y)
         self.symbol = 'q'
         self.sprite = ps.piece_sprites(self)
-        self.last_move = None
         self.points = 90 if self.color == 'w' else -90
 
     def get_possible_moves(self, board):

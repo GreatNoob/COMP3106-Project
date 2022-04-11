@@ -7,7 +7,6 @@ class Rook(Piece):
         super().__init__(color, x, y)
         self.symbol = 'r'
         self.sprite = ps.piece_sprites(self)
-        self.last_move = None
         self.points = 50 if self.color == 'w' else -50
 
     def get_possible_moves(self, board):

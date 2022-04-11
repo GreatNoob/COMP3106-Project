@@ -7,7 +7,6 @@ class Knight(Piece):
         super().__init__(color, x, y)
         self.symbol = 'n'
         self.sprite = ps.piece_sprites(self)
-        self.last_move = None
         self.points = 30 if self.color == 'w' else -30
 
     def get_possible_moves(self, board):

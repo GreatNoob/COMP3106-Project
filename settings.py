@@ -14,4 +14,4 @@ ASSET_FOLDER = 'assets'
 ICON_PATH = os.path.join(ASSET_FOLDER, 'wp.png')
 ICON_SIZE = 32
 
-
+IS_DEBUG = True

@@ -8,7 +8,15 @@ class Piece:
         self.y = y
         self.sprite = None
         self.symbol = None
-        self.last_move = None
+        self.last_moves = []
+
+    @property
+    def last_move(self):
+        return self.last_moves[-1] if self.last_moves else None
+
+    @last_move.setter
+    def last_move(self, value):
+        self.last_moves.append(value)
 
     def get_position(self):
         return [self.x, self.y]

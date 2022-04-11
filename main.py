@@ -1,3 +1,4 @@
+from re import T
 import pygame
 
 import settings
@@ -11,8 +12,9 @@ def main():
     pygame.display.set_caption('Chess')
     icon = pygame.transform.smoothscale(pygame.image.load(settings.ICON_PATH), (settings.ICON_SIZE, settings.ICON_SIZE))
     pygame.display.set_icon(icon)
+    
     game = Game(window)
-    game.start_against_ai()
+    game.start(True)
     pygame.quit()
 
 

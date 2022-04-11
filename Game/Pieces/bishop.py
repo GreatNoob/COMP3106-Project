@@ -8,7 +8,6 @@ class Bishop(Piece):
         super().__init__(color, x, y)
         self.symbol = 'b'
         self.sprite = ps.piece_sprites(self)
-        self.last_move = None
 
         self.points = 30 if self.color == 'w' else -30
 

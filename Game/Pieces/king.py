@@ -11,7 +11,6 @@ class King(Piece):
         super().__init__(color, x, y)
         self.symbol = 'k'
         self.sprite = ps.piece_sprites(self)
-        self.last_move = None
 
         self.points = 900 if self.color == 'w' else -900
 

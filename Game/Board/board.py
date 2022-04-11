@@ -1,4 +1,5 @@
 import math
+from Game.Pieces.piece import Piece
 from Game.Pieces.bishop import Bishop
 from Game.Pieces.king import King
 from Game.Pieces.knight import Knight
@@ -61,16 +62,46 @@ class Board:
         new_position = self.move_arr[-1][4]
         return old_position, new_position
 
-    def get_legal_moves(self, piece, ai=False):
+    def get_legal_moves(self, piece):
         move_arr, capture_arr = piece.get_possible_moves(self)
-        move_arr_legal = self.__get_legal_array(piece, move_arr, ai)
-        capture_arr_legal = self.__get_legal_array(piece, capture_arr, ai)
+        move_arr_legal = self.__get_legal_array(piece, move_arr)
+        capture_arr_legal = self.__get_legal_array(piece, capture_arr)
         return move_arr_legal, capture_arr_legal
 
-    def __get_legal_array(self, piece, move_arr, ai):
+    def get_all_pieces(self):
+        for row in self.board_arr:
+            for piece in row:
+                if piece is not None:
+                    yield piece
+
+    def get_all_legal_moves(self, color):
+        for piece in self.get_all_pieces():
+            if piece.color == color:
+                moves, capture_moves = self.get_legal_moves(piece)
+                yield moves + capture_moves, piece
+
+    def get_all_legal_board_states(self, color):
+        piece: Piece
+        for moves, piece in self.get_all_legal_moves(color):
+            for move in moves:
+                old_position = piece.get_position()
+                piece_org = self.fake_move(piece, move)
+                try:
+                    yield self, piece, move
+                finally:
+                    self.revert_move(piece_org, piece, old_position, move)
+    
+    def revert_move(self, piece_none, piece, old_position, i):
+        if piece_none is None:
+            self.fake_move(piece, old_position)
+        elif piece_none is not None:
+            self.fake_move(piece, old_position)
+            self.fake_move(piece_none, i)
+
+    def __get_legal_array(self, piece, move_arr):
         result = []
         for move in move_arr:
-            if self.__validate_move(piece, move, ai):
+            if self.__validate_move(piece, move):
                 result.append(move)
         return result
 
@@ -97,8 +128,9 @@ class Board:
         old_y = piece.y
         piece.change_position(position)
         piece.last_move = self.turn_number
+        old_piece = self.board_arr[position[0]][position[1]]
         self.board_arr[position[0]][position[1]] = piece
-        self.move_arr.append([self.turn_number, piece.color, piece.symbol, [old_x, old_y], [piece.x, piece.y], piece])
+        self.move_arr.append([self.turn_number, piece.color, piece.symbol, [old_x, old_y], [piece.x, piece.y], piece, old_piece])
         self.turn_number += 1
         self.check_black_king = False
         self.check_white_king = False
@@ -112,7 +144,7 @@ class Board:
                     captures = captures + capture_arr
         return captures
 
-    def __validate_move(self, piece, new_position, ai):
+    def __validate_move(self, piece, new_position):
         # tries making the move and checks all possible enemy responses to it
         # returns False if enemy can respond by capturing your king
         # this function makes moves on the actual game board and reverts them after it's finished
@@ -138,8 +170,8 @@ class Board:
 
         # if king is trying to castle through attacked position or through check
         if is_move_castling(piece, old_position):
-            if math.fabs(new_x - old_x) == 2 and not self.__validate_move(piece, [5, new_y], ai) \
-                    or math.fabs(new_x - old_x) == 3 and not self.__validate_move(piece, [3, new_y], ai) \
+            if math.fabs(new_x - old_x) == 2 and not self.__validate_move(piece, [5, new_y]) \
+                    or math.fabs(new_x - old_x) == 3 and not self.__validate_move(piece, [3, new_y]) \
                     or self.is_in_check(piece):
                 self.__revert_move(piece, captured_piece, old_position, new_position)
                 return False
@@ -164,6 +196,19 @@ class Board:
         self.board_arr[old_position[0]][old_position[1]] = piece
         self.board_arr[current_position[0]][current_position[1]] = captured_piece
         piece.change_position(old_position)
+
+    def revert_last_move(self):
+        if not self.move_arr:
+            return
+        last_move = self.move_arr.pop()
+        self.turn_number, _, _, old_position, new_position, piece, old_piece = last_move
+        
+        self.__revert_move(piece, old_piece, old_position, new_position)
+        piece.last_moves.pop()
+
+        self.check_black_king = False
+        self.check_white_king = False
+        self.next_turn()
 
     def promote_pawn(self, pawn, choice):
 
