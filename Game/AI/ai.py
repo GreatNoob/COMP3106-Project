@@ -57,24 +57,7 @@ class AI:
                     return worst_move_eval
             return worst_move_eval
 
-#### MINMAXROOT ####
-    def minmaxRoot(self, depth, board: Board, is_maximizing_player: bool):
 
-        newGameMoves = board.get_all_legal_moves(self.side)
-        best_move_eval = -AI.INF
-        bestMoveFound = []
-
-        for board_, _, _ in newGameMoves:
-            board.get_legal_moves(board_) #<----????
-            value = self.minmax(depth-1, board, -10000, 10000, not is_maximizing_player)
-            board.revert_last_move()
-
-            if(value >= best_move_eval):
-                best_move_eval = value
-                bestMoveFound = board_
-
-        return bestMoveFound
-#####################
 
     def get_best_move2(self, side):
         self.side = side
