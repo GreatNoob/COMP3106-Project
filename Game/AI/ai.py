@@ -4,6 +4,11 @@ from Game.AI.position_points import get_position_points
 def flip_color(color):
     return 'w' if color == 'b' else 'b'
 
+def z_g(n):
+    if n <= 0:
+        return 0
+    return n
+
 class AI:
     INF = 99999
 
@@ -28,6 +33,7 @@ class AI:
                 piece_to_move = piece
                 best_move_eval = evaluation
         
+        print(f"evaluation: {evaluation}")
         return piece_to_move, best_move
 
     def minmax(self, depth, board: Board, alpha, beta, is_maximizing_player: bool):
