@@ -70,4 +70,4 @@ class AIQuiesce(AI):
 
     def evaluate_board2(self, board, color):
         value = self.evaluate_board(board)
-        return value if color == self.side else -value
+        return -value if color == self.side else value
