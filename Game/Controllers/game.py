@@ -4,6 +4,7 @@ import pygame
 import settings
 from Game.utils import is_on_board, LEFT_CLICK, RIGHT_CLICK
 from Game.AI.ai import AI
+from Game.AI import AIAlphaBeta, AIQuiesce
 
 from GUI.gamedrawer import GameDrawer
 from Game.Board.board import Board
@@ -27,9 +28,13 @@ class Game:
         self.capture_sound = pygame.mixer.Sound(os.path.join(settings.ASSET_FOLDER, 'sounds/Capture.ogg'))
 
         self.clock = pygame.time.Clock()
-        self.opponent = AI(self.board)
 
-    def start(self, start_ai=False):
+        self.ai_1 = AIAlphaBeta(self.board, settings.AI_LEVEL)
+        self.ai_2 = AIQuiesce(self.board, settings.AI_LEVEL)
+
+        self.opponent: AI = AI(self.board, settings.AI_LEVEL)
+
+    def start(self, start_ai=False, self_play=False):
         pygame.event.clear()
         while self.not_gameover:
             self.redraw()
@@ -39,6 +44,8 @@ class Game:
 
             if start_ai:
                 self.__ai_move("b", 2)
+                if self_play:
+                    self.__ai_move("w", 1)
 
             self.__check_if_game_over()
 
@@ -49,9 +56,9 @@ class Game:
     def __ai_move(self, player, method):
         if self.board.current_player == player:
             if method == 1:
-                piece_, best_move = self.opponent.get_best_move(player)
+                piece_, best_move = self.ai_1.get_best_move(player)
             elif method == 2:
-                piece_, best_move = self.opponent.get_best_move2(player)
+                piece_, best_move = self.ai_2.get_best_move(player)
 
             if self.board.get_piece_at_position(best_move) is not None:
                 self.capture_sound.play()
