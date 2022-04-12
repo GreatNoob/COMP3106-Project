@@ -63,6 +63,8 @@ class AI:
                     return worst_move_eval
             return worst_move_eval
 
+
+
     def get_best_move2(self, side):
         self.side = side
 

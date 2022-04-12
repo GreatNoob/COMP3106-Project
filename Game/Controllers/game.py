@@ -49,9 +49,9 @@ class Game:
     def __ai_move(self, player, method):
         if self.board.current_player == player:
             if method == 1:
-                piece_, best_move = self.opponent.get_best_move2(player)
-            elif method == 2:
                 piece_, best_move = self.opponent.get_best_move(player)
+            elif method == 2:
+                piece_, best_move = self.opponent.get_best_move2(player)
 
             if self.board.get_piece_at_position(best_move) is not None:
                 self.capture_sound.play()
